@@ -1,5 +1,6 @@
 var React = require('react');
 var Router = require('react-router');
+var Clipboard = require('react-copy-to-clipboard');
 var mui = require('material-ui');
 var { FlatButton,
   Dialog,
@@ -15,6 +16,7 @@ var ShareAsk = React.createClass({
   getInitialState: function() {
     return {
       dialOpen : false,
+      shareUrl : '',
       result : '',
     };
   },
@@ -79,12 +81,16 @@ var ShareAsk = React.createClass({
             <img src="img/facebook-box.png" style={styles.logo}/>
             <div style={styles.fontSt}>Facebook</div>
           </FlatButton>
-          <FlatButton
-            style={styles.shareBt}
-            onTouchTap={this._share} >
-            <img src="img/paperclip.png" style={styles.logo}/>
-            <div style={styles.fontSt}>Copy URL</div>
-          </FlatButton>
+          <Clipboard
+            text={this.state.shareUrl}
+            onCopy={this.handleCopy} >
+            <FlatButton
+              style={styles.shareBt}
+              onTouchTap={this._share} >
+              <img src="img/paperclip.png" style={styles.logo}/>
+              <div style={styles.fontSt}>Copy URL</div>
+            </FlatButton>
+          </Clipboard>
         </Dialog>
 	<Snackbar
 	  ref="snackbar"
@@ -94,7 +100,7 @@ var ShareAsk = React.createClass({
   },
 
   _kakaotalkShare: function() {
-    Kakao.Link.createTalkButton({
+    Kakao.Link.sendTalkLink({
       label: 'What is your choice?',
       image: {
         src: 'http://askus.me/img/askus.png',
@@ -103,18 +109,16 @@ var ShareAsk = React.createClass({
       },
       webButton: {
         text: 'Go to vote!',
-	url: 'http://localhost:3000/#/ask-by-index?index=' + this.props.shareIndex,
+	url: "http://localhost:3000/#/ask-by-index?index="+this.props.shareIndex,
         //TODO : enable askus url after applying to master
 	//url: 'http://askus.me/#/ask-by-index?index=' + this.props.shareIndex,
       },
       //TODO: add marketParams after release Native App
-      fail: {
-        function() {
+      fail: function() {
           console.log('not supported platform');
           this.setState({result: "not supported device"});
           this.refs.snackbar.show();
-	}
-      }
+      }.bind(this),
     });
   },
 
@@ -123,16 +127,23 @@ var ShareAsk = React.createClass({
      * Make URL and share to Facebook */
   },
 
-  _share: function(e) {
-    e.originalEvent.dataTransfer.setData("Text", 'http://localhost:3000/#/ask-by-index?index=' + this.props.shareIndex);
+  _share: function() {
+    console.log('copy url!!!!!!');
+    console.log(this.props.shareIndex);
+    var url = "http://localhost:3000/#/ask-by-index?index="+this.props.shareIndex;
+    console.log(url);
+    this.setState({shareUrl: url});
     //TODO : enable askus url after applying to master
-    //window.clipboardData.setData("Text", 'http://askus.me/#/ask-by-index?index=' + this.props.shareIndex);
-    this.setState({result: "success copy this ask's url"});
-    this.refs.snackbar.show();
+    //'http://askus.me/#/ask-by-index?index=' + this.props.shareIndex
   },
 
   _onClose: function() {
     this.setState({dialOpen: false});
+  },
+
+  handleCopy: function() {
+    this.setState({result: "success copy this ask's url"});
+    this.refs.snackbar.show();
   },
 
   handleShareButtonTouchTap: function() {
