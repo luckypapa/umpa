@@ -63,7 +63,7 @@ var ShareAsk = React.createClass({
           onRequestClose={this._onClose}>
           <FlatButton
             style={styles.shareBt}
-            onTouchTap={this._share} >
+            onTouchTap={this._kakaotalkShare} >
             <img src="img/kakaoIcon.png" style={styles.logo}/>
             <div style={styles.fontSt}>Kakaotalk</div>
           </FlatButton>
@@ -84,9 +84,36 @@ var ShareAsk = React.createClass({
     );
   },
 
+  _kakaotalkShare: function() {
+    Kakao.Link.createTalkButton({
+      label: 'What is your choice?',
+      image: {
+        src: 'http://askus.me/img/askus.png',
+	width: '300',
+	height: '200'
+      },
+      webButton: {
+        text: 'Go to vote!',
+	//url: 'http://askus.me/#/ask-by-index?index='+this.props.shareIndex,
+	//TODO: enable index asks url (current default url is main page)
+      },
+      //TODO: add marketParams after release Native App
+      fail: {
+        function() {
+          console.log('not support platform');
+	}
+      }
+    });
+  },
+
+  _facebookShare: function() {
+    /* TO DO
+     * Make URL and share to Facebook */
+  },
+
   _share: function() {
     /* TO DO
-     * Make URL and share to kakao/Facebook/URL */
+     * Make URL and share to URL */
   },
 
   _onClose: function() {
