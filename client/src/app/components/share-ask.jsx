@@ -1,7 +1,12 @@
 var React = require('react');
 var Router = require('react-router');
 var mui = require('material-ui');
-var { FlatButton, Dialog, TextField, IconButton, RaisedButton } = mui;
+var { FlatButton,
+  Dialog,
+  TextField,
+  IconButton,
+  RaisedButton,
+  Snackbar } = mui;
 var Colors = mui.Styles.Colors;
 
 var Share = require('./svg-icons/share.jsx');
@@ -10,6 +15,7 @@ var ShareAsk = React.createClass({
   getInitialState: function() {
     return {
       dialOpen : false,
+      result : '',
     };
   },
 
@@ -80,6 +86,9 @@ var ShareAsk = React.createClass({
             <div style={styles.fontSt}>Copy URL</div>
           </FlatButton>
         </Dialog>
+	<Snackbar
+	  ref="snackbar"
+	  message={this.state.result} />
       </div>
     );
   },
@@ -94,13 +103,16 @@ var ShareAsk = React.createClass({
       },
       webButton: {
         text: 'Go to vote!',
-	//url: 'http://askus.me/#/ask-by-index?index='+this.props.shareIndex,
-	//TODO: enable index asks url (current default url is main page)
+	url: 'http://localhost:3000/#/ask-by-index?index=' + this.props.shareIndex,
+        //TODO : enable askus url after applying to master
+	//url: 'http://askus.me/#/ask-by-index?index=' + this.props.shareIndex,
       },
       //TODO: add marketParams after release Native App
       fail: {
         function() {
-          console.log('not support platform');
+          console.log('not supported platform');
+          this.setState({result: "not supported device"});
+          this.refs.snackbar.show();
 	}
       }
     });
@@ -111,9 +123,12 @@ var ShareAsk = React.createClass({
      * Make URL and share to Facebook */
   },
 
-  _share: function() {
-    /* TO DO
-     * Make URL and share to URL */
+  _share: function(e) {
+    e.originalEvent.dataTransfer.setData("Text", 'http://localhost:3000/#/ask-by-index?index=' + this.props.shareIndex);
+    //TODO : enable askus url after applying to master
+    //window.clipboardData.setData("Text", 'http://askus.me/#/ask-by-index?index=' + this.props.shareIndex);
+    this.setState({result: "success copy this ask's url"});
+    this.refs.snackbar.show();
   },
 
   _onClose: function() {
